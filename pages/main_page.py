@@ -2,7 +2,6 @@ from pages.base_page import BasePage
 from locators import MainPageLocators
 import allure
 
-
 class MainPage(BasePage):
     def __init__(self, driver):
         super().__init__(driver)
@@ -21,17 +20,27 @@ class MainPage(BasePage):
             questions.append(question_element.text)
         return questions
 
-    @allure.step("Кликнуть на вопрос с индексом {index}")
-    def click_faq_question(self, index):
+    @allure.step("Кликнуть на вопрос '{question_text}'")
+    def click_faq_question_by_text(self, question_text):
         items = self.find_elements(self.locators.FAQ_ACCORDION_ITEM)
-        question_element = items[index].find_element(*self.locators.FAQ_QUESTION_BUTTON)
-        question_element.click()
+        for item in items:
+            question_element = item.find_element(*self.locators.FAQ_QUESTION_BUTTON)
+            if question_element.text == question_text:
+                question_element.click()
+                return
+        raise AssertionError(f"Вопрос с текстом '{question_text}' не найден на странице")
 
-    @allure.step("Получить текст ответа на вопрос с индексом {index}")
-    def get_faq_answer_text(self, index):
+    @allure.step("Получить текст ответа на вопрос '{question_text}'")
+    def get_faq_answer_text_by_question(self, question_text):
         items = self.find_elements(self.locators.FAQ_ACCORDION_ITEM)
-        answer_element = items[index].find_element(*self.locators.FAQ_ANSWER_PANEL)
-        return answer_element.text
+        for item in items:
+            question_element = item.find_element(*self.locators.FAQ_QUESTION_BUTTON)
+            if question_element.text == question_text:
+                # Кликаем, чтобы открыть ответ (если он еще закрыт)
+                question_element.click()
+                answer_element = item.find_element(*self.locators.FAQ_ANSWER_PANEL)
+                return answer_element.text
+        raise AssertionError(f"Вопрос с текстом '{question_text}' не найден на странице")
 
     @allure.step("Нажать на кнопку 'Заказать' в хедере")
     def click_order_button_header(self):
