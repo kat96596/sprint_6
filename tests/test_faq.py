@@ -3,7 +3,6 @@ import pytest
 from pages.main_page import MainPage
 from data import Urls, FaqData
 
-
 @allure.feature('FAQ')
 class TestFaq:
 
@@ -12,7 +11,7 @@ class TestFaq:
     @pytest.mark.parametrize('question_data', FaqData.questions)
     def test_faq_answer_text(self, driver, question_data):
         main_page = MainPage(driver)
-        main_page.open(Urls.BASE_URL)  # Предполагается, что метод open есть в BasePage
+        main_page.open(Urls.BASE_URL)
         main_page.accept_cookies()
 
         actual_answer = main_page.get_faq_answer_text_by_question(question_data["question"])
