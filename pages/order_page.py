@@ -2,7 +2,6 @@ from pages.base_page import BasePage
 from locators import OrderPageLocators
 import allure
 
-
 class OrderPage(BasePage):
     def __init__(self, driver):
         super().__init__(driver)
@@ -30,7 +29,8 @@ class OrderPage(BasePage):
         self.click_element(self.locators.RENTAL_PERIOD_DROPDOWN)
         period_options = self.find_elements(self.locators.RENTAL_PERIOD_OPTION)
         for option in period_options:
-            if data["rental_period"] in option.text.lower():
+            # Ищем по вхождению текста, чтобы быть устойчивым к регистру и падежам
+            if data["rental_period"].lower() in option.text.lower():
                 option.click()
                 break
 
@@ -52,13 +52,3 @@ class OrderPage(BasePage):
     @allure.step("Проверить, что появилось сообщение об успешном создании заказа")
     def is_success_modal_displayed(self):
         return self.find_element(self.locators.SUCCESS_MODAL).is_displayed()
-
-    @allure.step("Выполнить полный флоу заказа с указанной точкой входа")
-    def create_order(self, order_data, entry_point_function):
-        entry_point_function()
-        self.fill_customer_form(order_data)
-        self.click_next_button()
-        self.fill_rental_form(order_data)
-        self.click_order_button()
-        self.confirm_order()
-        return self.is_success_modal_displayed()
